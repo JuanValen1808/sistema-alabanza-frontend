@@ -2,7 +2,7 @@
 <template>
   <div class="min-h-screen bg-[#0a0a0a] text-neutral-100 flex flex-col selection:bg-white selection:text-black">
     
-    <!-- Navbar simple para volver al inicio o iniciar sesión -->
+    <!-- Navbar simple -->
     <header class="h-16 border-b border-[#262626] bg-[#0d0d0d] px-6 flex items-center justify-between z-10">
       <div class="flex items-center gap-4">
         <router-link to="/" class="text-xs sm:text-sm font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5">
@@ -20,13 +20,11 @@
       </router-link>
     </header>
 
-    <!-- Layout principal: Barra lateral izquierda (1/5) y Visor derecho (4/5) -->
+    <!-- Layout principal -->
     <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-4rem)]">
       
-      <!-- COLUMNA IZQUIERDA: Lista vertical fija de Coritos (1/5 de la pantalla) -->
+      <!-- COLUMNA IZQUIERDA: Lista de Coritos -->
       <aside class="lg:col-span-3 border-r border-[#262626] bg-[#0d0d0d] flex flex-col h-[calc(100vh-4rem)] lg:sticky lg:top-16">
-        
-        <!-- Cabecera de búsqueda con lupita -->
         <div class="p-4 border-b border-[#262626] space-y-3">
           <div class="flex items-center justify-between">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-neutral-400">Coritos y Alabanzas</h2>
@@ -50,7 +48,6 @@
           </div>
         </div>
 
-        <!-- Lista scrolleable de arriba hacia abajo -->
         <div class="flex-1 overflow-y-auto p-3 space-y-1">
           <div 
             v-for="song in filteredSongs" 
@@ -71,50 +68,19 @@
         </div>
       </aside>
 
-      <!-- COLUMNA DERECHA: Visor de Letra y Acordes (4/5 de la pantalla) -->
+      <!-- COLUMNA DERECHA: Usando el Componente SongViewer (Sin enlaces multimedia) -->
       <main class="lg:col-span-9 p-6 sm:p-10 bg-[#0a0a0a] overflow-y-auto">
-        <div v-if="selectedSong" class="max-w-4xl mx-auto space-y-8">
-          
-          <!-- Encabezado del corito -->
-          <div class="bg-[#121212] p-6 sm:p-8 rounded-2xl border border-[#262626] space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#262626] pb-4">
-              <div>
-                <span class="text-[10px] font-mono uppercase tracking-wider text-neutral-500">Iglesia Misión Pentecostal</span>
-                <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">{{ selectedSong.title }}</h1>
-                <p class="text-xs text-neutral-400 mt-1" v-if="selectedSong.composer">Autor: {{ selectedSong.composer }}</p>
-              </div>
+        <SongViewer 
+          v-if="selectedSong"
+          :title="selectedSong.title"
+          :composer="selectedSong.composer"
+          :musicalKey="selectedSong.musicalKey"
+          :tempo="selectedSong.tempo"
+          :chords="selectedSong.chords"
+          :lyrics="selectedSong.lyrics"
+          :showMediaLinks="false"
+        />
 
-              <div class="flex items-center gap-2">
-                <div class="px-3 py-1.5 rounded-lg bg-[#161616] border border-[#262626] text-xs font-mono text-neutral-300">
-                  Tono: <strong class="text-white font-bold">{{ selectedSong.musicalKey || '-' }}</strong>
-                </div>
-                <div class="px-3 py-1.5 rounded-lg bg-[#161616] border border-[#262626] text-xs font-mono text-neutral-300">
-                  BPM: <strong class="text-white font-bold">{{ selectedSong.tempo || '-' }}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-3 pt-1">
-              <a 
-                v-if="selectedSong.youtubeLink" 
-                :href="selectedSong.youtubeLink" 
-                target="_blank" 
-                class="px-3 py-1.5 bg-[#1a1a1a] hover:bg-[#252525] text-neutral-300 text-xs rounded-lg border border-[#333] flex items-center gap-2 transition-all"
-              >
-                <span>YouTube</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Letra y Acordes formateados estilo Hoyrics -->
-          <div class="bg-[#121212] p-6 sm:p-10 rounded-2xl border border-[#262626] space-y-6">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-neutral-500 border-b border-[#262626] pb-3">Letra y Acordes</h3>
-            <pre class="font-mono text-xs sm:text-sm text-neutral-200 whitespace-pre-wrap leading-relaxed bg-[#0f0f0f] p-6 rounded-xl border border-[#1f1f1f]">{{ selectedSong.chords }}</pre>
-          </div>
-
-        </div>
-
-        <!-- Estado vacío -->
         <div v-else class="h-full flex flex-col items-center justify-center text-center py-20 text-neutral-500 space-y-2">
           <svg class="w-10 h-10 stroke-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
@@ -130,6 +96,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import api from '@/services/api';
+import SongViewer from '@/components/SongViewer.vue';
 
 const songs = ref([]);
 const searchQuery = ref('');
@@ -143,8 +110,6 @@ const filteredSongs = computed(() => {
 
 const fetchSongs = async () => {
   try {
-    // Si tu API permite listar canciones sin token (público), esto funcionará directo.
-    // Si requiere autenticación para el endpoint general, puedes crear un endpoint público en tu backend tipo /songs/public
     const res = await api.get('/songs');
     songs.value = res.data;
     if (songs.value.length > 0 && !selectedSong.value) {

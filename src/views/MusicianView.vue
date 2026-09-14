@@ -1,9 +1,9 @@
 <!-- src/views/MusicianView.vue -->
 <template>
-        <Navbar/>
-  <div class="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
-    <!-- Banner del Culto Más Cercano del Momento -->
-    <div v-if="nearestService" class="dark-card p-5 border border-[#333] bg-[#121212] space-y-3 relative overflow-hidden">
+  <Navbar/>
+  <div class="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
+    <!-- Banner del Culto Más Cercano -->
+    <div v-if="nearestService" class="dark-card p-5 border border-[#333] bg-[#121212] space-y-3 relative overflow-hidden rounded-xl">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#262626] pb-3">
         <div>
           <span class="text-[10px] uppercase tracking-wider bg-neutral-800 text-neutral-300 px-2 py-0.5 rounded border border-neutral-700">Próximo Culto</span>
@@ -34,50 +34,43 @@
       type="text" 
       v-model="searchQuery" 
       placeholder="Buscar por título, compositor o tono..." 
-      class="w-full dark-input p-3 text-sm"
+      class="w-full bg-[#121212] border border-[#262626] text-white p-3 text-sm rounded-xl outline-none focus:border-white transition-all"
     />
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Lista de Canciones -->
-      <div class="col-span-1 dark-card p-4 overflow-y-auto max-h-[500px] space-y-2">
-        <h2 class="font-semibold text-sm text-neutral-400 uppercase tracking-wider mb-3">Catálogo General</h2>
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- Lista de Canciones (4 columnas) -->
+      <div class="md:col-span-4 bg-[#121212] border border-[#262626] p-4 rounded-2xl overflow-y-auto max-h-[600px] space-y-2">
+        <h2 class="font-semibold text-xs uppercase tracking-wider text-neutral-400 mb-3">Catálogo General</h2>
         <div class="space-y-1">
           <div 
             v-for="song in filteredSongs" 
             :key="song.id" 
             @click="selectSong(song)"
-            class="p-3 rounded-lg cursor-pointer transition-all border border-transparent flex justify-between items-center"
-            :class="selectedSong?.id === song.id ? 'bg-[#1f1f1f] border-[#404040]' : 'hover:bg-[#171717] hover:border-[#262626]'"
+            class="p-3 rounded-lg cursor-pointer transition-all border border-transparent flex justify-between items-center text-xs"
+            :class="selectedSong?.id === song.id ? 'bg-[#1f1f1f] border-[#404040] text-white font-medium' : 'hover:bg-[#171717] hover:border-[#262626] text-neutral-300'"
           >
-            <div>
-              <p class="font-medium text-sm text-neutral-200">{{ song.title }}</p>
-              <p class="text-xs text-neutral-400 mt-0.5">Tono: <span class="text-neutral-200 font-mono font-bold">{{ song.musicalKey || 'N/A' }}</span></p>
-            </div>
+            <span class="truncate pr-2">{{ song.title }}</span>
+            <span class="font-mono text-[11px] text-neutral-400 shrink-0">{{ song.musicalKey || '-' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Detalle de la Canción Seleccionada -->
-      <div class="col-span-2 dark-card p-4 sm:p-6 space-y-6">
-        <div v-if="selectedSong" class="space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#262626] pb-4">
-            <div>
-              <h2 class="text-xl font-semibold text-white">{{ selectedSong.title }}</h2>
-              <p class="text-xs text-neutral-400 mt-0.5">Autor: {{ selectedSong.composer || 'Desconocido' }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="bg-[#1f1f1f] border border-[#2b2b2b] text-neutral-200 px-2.5 py-1 rounded-md font-mono text-xs">Tono: {{ selectedSong.musicalKey }}</span>
-              <span class="bg-[#1f1f1f] border border-[#2b2b2b] text-neutral-400 px-2.5 py-1 rounded-md text-xs">BPM: {{ selectedSong.tempo || 'Libre' }}</span>
-            </div>
-          </div>
+      <!-- Detalle de la Canción con SongViewer (8 columnas) -->
+      <div class="md:col-span-8">
+        <SongViewer 
+          v-if="selectedSong"
+          :title="selectedSong.title"
+          :composer="selectedSong.composer"
+          :musicalKey="selectedSong.musicalKey"
+          :tempo="selectedSong.tempo"
+          :chords="selectedSong.chords"
+          :lyrics="selectedSong.lyrics"
+          :youtubeLink="selectedSong.youtubeLink"
+          :driveLink="selectedSong.driveLink"
+          :showMediaLinks="true"
+        />
 
-          <!-- Letra y Acordes -->
-          <div class="space-y-2">
-            <h3 class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Letra y Acordes</h3>
-            <pre class="dark-card bg-[#171717] p-4 text-xs sm:text-sm font-mono text-neutral-300 border border-[#222] leading-relaxed">{{ selectedSong.chords || selectedSong.lyrics || 'Sin contenido registrado.' }}</pre>
-          </div>
-        </div>
-        <div v-else class="text-center text-neutral-500 py-16 text-sm">
+        <div v-else class="bg-[#121212] border border-[#262626] rounded-2xl text-center text-neutral-500 py-24 text-sm">
           <p>Selecciona una alabanza de la lista para ver sus acordes y detalles.</p>
         </div>
       </div>
@@ -90,6 +83,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '@/services/api';
 import Navbar from '@/components/Navbar.vue';
+import SongViewer from '@/components/SongViewer.vue';
 
 const router = useRouter();
 const songs = ref([]);
@@ -110,6 +104,9 @@ const fetchSongs = async () => {
   try {
     const res = await api.get('/songs');
     songs.value = res.data;
+    if (songs.value.length > 0 && !selectedSong.value) {
+      selectedSong.value = songs.value[0];
+    }
   } catch (error) {
     console.error('Error al cargar canciones:', error);
   }
@@ -127,11 +124,6 @@ const filteredSongs = computed(() => {
 
 const selectSong = (song) => {
   selectedSong.value = song;
-};
-
-const logout = () => {
-  localStorage.clear();
-  router.push('/login');
 };
 
 onMounted(() => {
