@@ -10,7 +10,7 @@
       
       <!-- LOGO DE FONDO (Con menos blur para que se aprecie mejor la forma) -->
       <img 
-        src="@/assets/logo-iglesia.png" 
+        src="@/assets/logo-imp.png" 
         alt="Logo de fondo" 
         class="w-[38rem] sm:w-[48rem] md:w-[55rem] h-auto object-contain filter blur-[28px] opacity-20 transform scale-105 select-none"
       />
@@ -21,7 +21,7 @@
       <div class="w-full px-6 sm:px-10 h-16 flex items-center justify-between">
         <router-link to="/" class="text-sm sm:text-base font-semibold text-stone-100 tracking-tight flex items-center gap-3">
           <!-- LOGO DEL NAVBAR MÁS GRANDE -->
-          <img src="@/assets/logo-iglesia.png" alt="Logo" class="w-9 h-9 object-contain drop-shadow-md" />
+          <img src="@/assets/logo-imp.png" alt="Logo" class="w-9 h-9 object-contain drop-shadow-md" />
           <span>Sistema Alabanza &bull; IMP</span>
         </router-link>
         

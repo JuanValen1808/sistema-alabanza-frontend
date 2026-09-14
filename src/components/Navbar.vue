@@ -8,7 +8,7 @@
       <!-- Logo y Enlaces -->
       <div class="flex items-center gap-6">
         <router-link to="/" class="text-sm sm:text-base font-semibold text-white tracking-tight flex items-center gap-2.5">
-          <img src="@/assets/logo-iglesia.png" alt="Logo" class="w-8 h-8 object-contain" />
+          <img src="@/assets/logo-imp.png" alt="Logo" class="w-8 h-8 object-contain" />
           <span>Sistema Alabanza</span>
         </router-link>
         
