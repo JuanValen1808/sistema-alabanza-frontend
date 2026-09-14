@@ -156,10 +156,12 @@
     </main>
   </div>
 </template>
-
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
+
+// Definimos la URL base dependiendo de si estás en desarrollo o producción
+const API_URL = import.meta.env.VITE_API_URL || 'https://sistema-alabanza-backend.onrender.com';
 
 const form = reactive({
   name: '',
@@ -177,7 +179,7 @@ const usuarios = ref([]);
 const fetchUsuarios = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:3000/users', {
+    const response = await fetch(`${API_URL}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +214,7 @@ const handleRegister = async () => {
   try {
     const token = localStorage.getItem('token');
     
-    const response = await fetch('http://localhost:3000/auth/register', {
+    const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -249,7 +251,7 @@ const eliminarUsuario = async (id, nombre) => {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:3000/users/${id}`, {
+    const response = await fetch(`${API_URL}/users/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -260,7 +262,6 @@ const eliminarUsuario = async (id, nombre) => {
       throw new Error('No se pudo eliminar el usuario');
     }
 
-    // Refrescamos la lista de inmediato
     fetchUsuarios();
   } catch (err) {
     alert('Error al eliminar: ' + err.message);
